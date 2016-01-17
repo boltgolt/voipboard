@@ -78,7 +78,7 @@ module.exports = [
 		"duration": 7
 	},
 	{
-		"id": "Thomas",
+		"id": "thomas",
 		"name": "Thomas the Tank Engine intro song",
 		"source": "Thomas the Tank Engine",
 		"duration": 19
