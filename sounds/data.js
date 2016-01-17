@@ -91,8 +91,15 @@ module.exports = [
 	},
 	{
 		"id": "darude",
-		"name": "All of Darude - Sandstorm ",
-		"source": "Darude - Sandstorm",
+		"name": "Sandstorm",
+		"source": "Darude",
 		"duration": 232
+	},
+	{
+		"id": "chipmunk",
+		"name": "Dramatic chipmunk",
+		"source": "Hello! Morning",
+		"duration": 5	
+	}
 	}
 ]
