@@ -1,0 +1,14 @@
+{
+	"name": "voipboard",
+	"description": "A soundboard for ANY VoIP client on Ubuntu",
+	"version": "0.0.1",
+	"main": "main.js",
+	"dependencies": {
+		"socket.io": "latest",
+		"electron-prebuilt": "latest",
+		"electron-safe-ipc": "latest"
+	},
+	"scripts": {
+		"start": "./node_modules/.bin/electron ."
+	}
+}
