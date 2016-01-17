@@ -71,4 +71,10 @@ module.exports = [
 		"source": "Jurassic Park",
 		"duration": 2
 	}
+	{
+		"id": "johnCena"
+		"name": "JOOOOHHHNN CEEENNAAAAA"
+		"source": WWE
+		"duration": 7
+	}
 ]
