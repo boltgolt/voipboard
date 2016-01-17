@@ -88,5 +88,11 @@ module.exports = [
 		"name": "Legitness",
 		"source": "Unknown",
 		"duration": 1
+	},
+	{
+		"id": "darude",
+		"name": "All of Darude - Sandstorm ",
+		"source": "Darude - Sandstorm",
+		"duration": 232
 	}
 ]

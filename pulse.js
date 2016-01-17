@@ -10,6 +10,9 @@ var activeModules = []
 var clean = false
 var aplaySetup = false
 
+// Weird bug fix
+var PlayBoard = "PlayBoard_" + Math.random().toString(36).slice(-5)
+
 module.exports = {
 	startServer: function(callback) {
 		print(null, "Checking pulseaudio status", true)
@@ -35,7 +38,7 @@ module.exports = {
 				printStatus(1)
 				print(null, "Starting board/mic playback output", true)
 
-				exec("pactl load-module module-null-sink sink_name='PlayittBoard' sink_properties=device.description='Playback_grab_Null_sink'", function (error, stdout, stderr) {
+				exec("pactl load-module module-null-sink sink_name='" + PlayBoard + "' sink_properties=device.description='Playback_grab_Null_sink'", function (error, stdout, stderr) {
 					if (error) {
 						printStatus(2)
 						process.exit(0)
@@ -46,7 +49,7 @@ module.exports = {
 					printStatus(1)
 					print(null, "Opening stream between recording and playback sink", true)
 
-					exec("pactl load-module module-loopback source='GrabBoard.monitor' sink='PlayittBoard'", function (error, stdout, stderr) {
+					exec("pactl load-module module-loopback source='GrabBoard.monitor' sink='PlayBoard'", function (error, stdout, stderr) {
 						if (error) {
 							printStatus(2)
 							process.exit(0)
@@ -69,7 +72,7 @@ module.exports = {
 							printStatus(1)
 							print(null, "Adding mic to playback stream", true)
 
-							exec("pactl load-module module-loopback source='" + defaultSource + "' sink='PlayittBoard'", function (error, stdout, stderr) {
+							exec("pactl load-module module-loopback source='" + defaultSource + "' sink='PlayBoard'", function (error, stdout, stderr) {
 								if (error) {
 									printStatus(2)
 									process.exit(0)
@@ -136,7 +139,7 @@ module.exports = {
 			var sources = stdout.split("\n")
 
 			for (var i = 0; i < sources.length; i++) {
-				if (sources[i].indexOf("PlayittBoard.monitor") > -1) {
+				if (sources[i].indexOf("PlayBoard.monitor") > -1) {
 					var sourceId = sources[i].split("\t")[0]
 				}
 			}
