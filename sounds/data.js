@@ -82,5 +82,11 @@ module.exports = [
 		"name": "Thomas the Tank Engine intro song",
 		"source": "Thomas the Tank Engine",
 		"duration": 19
+	},
+	{
+		"id": "legit",
+		"name": "Legitness",
+		"source": "Unknown",
+		"duration": 1
 	}
 ]
