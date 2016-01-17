@@ -101,5 +101,4 @@ module.exports = [
 		"source": "Hello! Morning",
 		"duration": 5	
 	}
-	}
 ]
