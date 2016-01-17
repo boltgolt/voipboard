@@ -70,11 +70,11 @@ module.exports = [
 		"name": "Ah ah ah, you didn't say the magic word",
 		"source": "Jurassic Park",
 		"duration": 2
-	}
+	},
 	{
-		"id": "johnCena"
-		"name": "JOOOOHHHNN CEEENNAAAAA"
-		"source": WWE
+		"id": "johncena",
+		"name": "JOOOOHHHNN CEEENNAAAAA",
+		"source": "WWE",
 		"duration": 7
 	}
 ]

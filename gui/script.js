@@ -23,7 +23,7 @@ ipc.on("listRecording", function(apps) {
 })
 
 ipc.on("showMainInterface", function(app) {
-	document.getElementById("originalImage").src = "icons/" + (icons.indexOf(app.binary) != -1 ? apps[i].binary : "unknown") + ".png"
+	document.getElementById("originalImage").src = "icons/" + (icons.indexOf(app.binary) != -1 ? app.binary : "unknown") + ".png"
 	document.getElementById("appTitle").innerHTML = app.name
 
 	document.getElementById("appPick").style.opacity = 0
