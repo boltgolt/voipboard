@@ -2,6 +2,7 @@ var http = require("http")
 var io = require("socket.io")
 var fs = require("fs")
 var EventEmitter = require("events")
+var spawn = require("child_process").spawn
 var soundData = require("./sounds/data.js")
 
 var webserverEvents = new EventEmitter()
@@ -53,16 +54,56 @@ module.exports = {
 		var socket = io.listen(server);
 
 		socket.on("connection", function(client) {
+			var user = {
+				"pid": 0,
+				"cooldown": false,
+				"id": client.id
+			}
+
 			clientCount++
 			webserverEvents.emit("connectionCange", clientCount)
 
 			client.on("play", function(data) {
-				webserverEvents.emit("playSound", data)
+				var sound = getSoundById(data)
+
+				if (!sound || user.cooldown) {
+					return
+				}
+
+				user.cooldown = true
+
+				setTimeout(function () {
+					user.cooldown = false
+					client.emit("released")
+				}, (sound.duration + .5) * 1000);
+
+				webserverEvents.emit("playSound", {"soundId": data, "userId": user.id})
+			})
+
+			client.on("kill", function() {
+				if (user.pid == 0) {
+					return
+				}
+
+				// No idea why, but fixes bug
+				spawn("kill", [user.pid + 1])
+				user.cooldown = false
+				user.pid = 0
+				client.emit("released")
 			})
 
 			client.on("disconnect", function() {
 				clientCount--
 				webserverEvents.emit("connectionCange", clientCount)
+
+				if (user.pid != 0) {
+					spawn("kill", [user.pid + 1])
+					user.pid = 0
+				}
+			})
+
+			webserverEvents.on("passEcec-" + user.id, function(pid) {
+				user.pid = pid
 			})
 		})
 

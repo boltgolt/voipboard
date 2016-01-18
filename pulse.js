@@ -11,7 +11,7 @@ var clean = false
 var aplaySetup = false
 
 // Weird bug fix
-var PlayBoard = "PlayBoard_" + Math.random().toString(36).slice(-5)
+var PlayBoard = "PlayBoard" + Math.random().toString(36).slice(-5)
 
 module.exports = {
 	startServer: function(callback) {
@@ -49,7 +49,7 @@ module.exports = {
 					printStatus(1)
 					print(null, "Opening stream between recording and playback sink", true)
 
-					exec("pactl load-module module-loopback source='GrabBoard.monitor' sink='PlayBoard'", function (error, stdout, stderr) {
+					exec("pactl load-module module-loopback source='GrabBoard.monitor' sink='" + PlayBoard + "'", function (error, stdout, stderr) {
 						if (error) {
 							printStatus(2)
 							process.exit(0)
@@ -72,7 +72,7 @@ module.exports = {
 							printStatus(1)
 							print(null, "Adding mic to playback stream", true)
 
-							exec("pactl load-module module-loopback source='" + defaultSource + "' sink='PlayBoard'", function (error, stdout, stderr) {
+							exec("pactl load-module module-loopback source='" + defaultSource + "' sink='" + PlayBoard + "'", function (error, stdout, stderr) {
 								if (error) {
 									printStatus(2)
 									process.exit(0)
@@ -139,7 +139,7 @@ module.exports = {
 			var sources = stdout.split("\n")
 
 			for (var i = 0; i < sources.length; i++) {
-				if (sources[i].indexOf("PlayBoard.monitor") > -1) {
+				if (sources[i].indexOf("" + PlayBoard + ".monitor") > -1) {
 					var sourceId = sources[i].split("\t")[0]
 				}
 			}
@@ -160,13 +160,17 @@ module.exports = {
 		});
 	},
 
-	playSound: function(file) {
-		exec("aplay " + file, function (error, stdout, stderr) {
+	playSound: function(file, callback) {
+		var aplay = exec("aplay " + file, function (error, stdout, stderr) {
 			if (error) {
-				print(2, "Error playing sound")
-				return
+				if (error.signal != "SIGTERM") {
+					// print(2, "Error playing sound")
+					return
+				}
 			}
 		})
+
+		callback(aplay.pid)
 
 		if (!aplaySetup) {
 			aplaySetup = true
@@ -233,13 +237,6 @@ module.exports = {
 				})
 			}, 150)
 		}
-
-		exec("aplay " + file, function (error, stdout, stderr) {
-			if (error) {
-				print(2, "Error playing sound")
-				return// pactl move-sink input
-			}
-		})
 	},
 
 	cleanUp: function() {

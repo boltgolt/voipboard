@@ -10,6 +10,8 @@ var BrowserWindow = electron.BrowserWindow
 var mainWindow = null
 var printWaiting = false
 
+var pids = []
+
 // Print complete codes:
 //
 // 0: INFO
@@ -132,11 +134,15 @@ app.on("ready", function() {
 	ipc.on("pickedRecorder", function(id) {
 		pulseServer.bindRecording(id, function() {
 			webServer.startServer(function(webEvents) {
-
-				webEvents.on("playSound", function(id) {
-					var sound = getSoundById(id)
+				webEvents.on("playSound", function(data) {
+					var sound = getSoundById(data.soundId)
 					print(0, 'PLaying sound "' + sound.name + '"')
-					pulseServer.playSound(__dirname + "/sounds/wav/" + id + ".wav")
+
+					pulseServer.playSound(__dirname + "/sounds/wav/" + data.soundId + ".wav", function(pid) {
+						var id = pids.push(pid) -1
+						data.pid = pid
+						webEvents.emit("passEcec-" + data.userId, pid)
+					})
 				})
 
 				webEvents.on("connectionCange", function(nr) {
@@ -150,7 +156,7 @@ app.on("ready", function() {
 				}
 			}
 
-			pulseServer.playSound(__dirname + "/sounds/active.wav")
+			pulseServer.playSound(__dirname + "/sounds/active.wav", function() {})
 		})
 	})
 
@@ -160,6 +166,6 @@ app.on("ready", function() {
 })
 
 process.stdin.resume()
-process.on("exit", pulseServer.cleanUp)
-process.on("SIGINT", pulseServer.cleanUp)
-process.on("uncaughtException", pulseServer.cleanUp)
+// process.on("exit", pulseServer.cleanUp)
+// process.on("SIGINT", pulseServer.cleanUp)
+// process.on("uncaughtException", pulseServer.cleanUp)
