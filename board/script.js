@@ -51,25 +51,64 @@ var keys = [
 	}
 ]
 
+var sounds = /*JSON_SOUND_DATA*/
+
 var socket = io()
 var picking = false
 var playInterval
+var lastPlayed
+var nextPlay
+var blocked = false
 
 socket.on("connect", function() {
 	console.log("conn");
 })
 
+socket.on("reconnect", function() {
+	document.getElementById("fullScreen").style.opacity = 0
+
+	setTimeout(function () {
+		document.getElementById("fullScreen").style.display = "none"
+	}, 200)
+
+	socket.close()
+	location.reload()
+})
+
 socket.on("disconnect", function() {
-	// do semething
+	if (blocked) {
+		return
+	}
+
+	document.getElementById("fullScreen").style.display = "block"
+	document.getElementById("fullScreen").style.background = "#d35400"
+	document.getElementById("fullScreenText").innerHTML = "/*DISCONN_TEXT*/"
+
+	setTimeout(function () {
+		document.getElementById("fullScreen").style.opacity = 1
+	}, 10)
+})
+
+socket.on("blocked", function() {
+	document.getElementById("fullScreen").style.display = "block"
+	document.getElementById("fullScreen").style.background = "#c0392b"
+	document.getElementById("fullScreenText").innerHTML = "/*BLOCK_TEXT*/"
+
+	setTimeout(function () {
+		document.getElementById("fullScreen").style.opacity = 1
+	}, 10)
+
+	blocked = true
+	socket.close()
 })
 
 socket.on("released", function() {
-	if (playInterval) {
-		clearInterval(playInterval)
-		playInterval = false
-	}
+	stop(false)
 
-	updateProgress(0)
+	if (nextPlay) {
+		play(nextPlay)
+		nextPlay = false
+	}
 })
 
 socket.on("authDone", function() {
@@ -168,6 +207,39 @@ window.addEventListener("load", function() {
 			}
 		}
 	})
+
+	document.getElementById("playIcon").addEventListener("click", function() {
+		if (document.getElementById("playIcon").className == "fa fa-play") {
+			play(lastPlayed)
+		}
+		else {
+			stop(true)
+		}
+	})
+
+	document.getElementById("playReplay").addEventListener("click", function() {
+		nextPlay = lastPlayed
+		stop(true)
+	})
+
+	window.addEventListener("keydown", function(event) {
+		if (event.keyCode == 32) {
+			if (document.getElementById("playIcon").className == "fa fa-play") {
+				play(lastPlayed)
+			}
+			else {
+				stop(true)
+			}
+		}
+	})
+
+	setTimeout(function() {
+		document.getElementById("fullScreen").style.opacity = 0
+
+		setTimeout(function () {
+			document.getElementById("fullScreen").style.display = "none"
+		}, 200);
+	}, 300)
 })
 
 function updateSearch() {
@@ -229,7 +301,16 @@ function updateSearch() {
 }
 
 function play(id) {
+	if (playInterval) {
+		nextPlay = id
+		stop(true)
+		return
+	}
+
 	socket.emit("play", id)
+	lastPlayed = id
+
+	document.getElementById("playIcon").className = "fa fa-pause"
 
 	var duration = 0
 	var played = 0
@@ -240,18 +321,44 @@ function play(id) {
 		}
 	}
 
+	var totalMinutes = Math.floor(duration / 60)
+	var totalSeconds = duration - totalMinutes * 60
+
+	document.getElementById("timeTotal").innerHTML = ((totalMinutes < 10) ? "0" : "") + Math.round(totalMinutes) + ":" + ((totalSeconds < 10) ? "0" : "") + Math.round(totalSeconds)
+
 	playInterval = setInterval(function () {
 		played += 0.1
 
 		if (played / duration * 100 >= 100) {
-			clearInterval(playInterval)
-			playInterval = false
-			updateProgress(0)
+			stop(false)
 			return
 		}
 
-		updateProgress(played / duration * 100)
+		var playedMinutes = Math.floor(played / 60)
+		var playedSeconds = played - playedMinutes * 60
+
+		document.getElementById("timeCurrent").innerHTML = ((playedMinutes < 10) ? "0" : "") + Math.round(playedMinutes) + ":" + ((playedSeconds < 10) ? "0" : "") + Math.round(playedSeconds)
+
+		updateProgress(played / (duration + .5) * 100)
 	}, 100)
+}
+
+function stop(kill) {
+	if (kill) {
+		socket.emit("kill")
+	}
+
+	document.getElementById("timeTotal").innerHTML = "00:00"
+	document.getElementById("timeCurrent").innerHTML = "00:00"
+
+	document.getElementById("playIcon").className = "fa fa-play"
+
+	updateProgress(0)
+
+	if (playInterval) {
+		clearInterval(playInterval)
+		playInterval = false
+	}
 }
 
 function updateProgress(proc) {

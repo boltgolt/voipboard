@@ -16,10 +16,11 @@ module.exports = {
 			try {
 				if (req.url == "/") {
 					var html = fs.readFileSync("board/landing.html", "utf8")
-					html = html.replace("/*JSON_SOUND_DATA*/", JSON.stringify(soundData))
 					html = html.replace("/*NEED_AUTH*/", (config.web.password == false) ? "none" : "block")
+					html = html.replace("<!--SEARCH_TEXT-->", config.web.text.search)
 					html = html.replace("<!--NEED_AUTH_TEXT-->", config.web.text.needAuth)
 					html = html.replace("<!--PICK_TEXT-->", config.web.text.pickSound)
+					html = html.replace("<!--LOADING_TEXT-->", config.web.text.loading)
 
 					res.write(html)
 				}
@@ -27,7 +28,12 @@ module.exports = {
 					res.write(fs.readFileSync("board/style.css", "utf8"))
 				}
 				else if (req.url == "/script.js") {
-					res.write(fs.readFileSync("board/script.js", "utf8"))
+					var js = fs.readFileSync("board/script.js", "utf8")
+					js = js.replace("/*JSON_SOUND_DATA*/", JSON.stringify(soundData))
+					js = js.replace("/*DISCONN_TEXT*/", config.web.text.disconnect)
+					js = js.replace("/*BLOCK_TEXT*/", config.web.text.blocked)
+
+					res.write(js)
 				}
 				else if (req.url == "/data.json") {
 					res.write(fs.readFileSync("sounds/data.js", "utf8").replace("module.exports = ", ""))
@@ -56,8 +62,14 @@ module.exports = {
 			var user = {
 				"pid": 0,
 				"cooldown": false,
+				"timeout": false,
 				"auth": false,
-				"id": client.id
+				"id": client.id,
+				"spam": {
+					"blocked": false,
+					"second": 0,
+					"requests": 0
+				}
 			}
 
 			clientCount++
@@ -68,25 +80,39 @@ module.exports = {
 			}
 
 			client.on("play", function(data) {
-				console.log(data);
-				if (user.cooldown || !user.auth) {
+				if (user.cooldown || !user.auth || user.spam.blocked) {
 					return
 				}
-				console.log(data);
+
 				var sound = getSoundById(data)
 
 				if (!sound) {
 					return
 				}
-				console.log(data);
+
 				user.cooldown = true
 
-				setTimeout(function () {
+				user.timeout = setTimeout(function () {
 					user.cooldown = false
 					client.emit("released")
 				}, (sound.duration + .5) * 1000);
 
 				webserverEvents.emit("playSound", {"soundId": data, "userId": user.id})
+
+				if (config.web.blockSpam != 0) {
+					if (user.spam.second != Math.round(new Date().getTime() / 1000)) {
+						user.spam.second = Math.round(new Date().getTime() / 1000)
+					}
+					else {
+						user.spam.requests++
+
+						if (user.spam.requests >= config.web.blockSpam) {
+							user.spam.blocked = true
+							client.emit("blocked")
+						}
+					}
+
+				}
 			})
 
 			client.on("kill", function() {
@@ -94,11 +120,14 @@ module.exports = {
 					return
 				}
 
-				// No idea why, but fixes bug
-				spawn("kill", [user.pid + 1])
-				user.cooldown = false
-				user.pid = 0
-				client.emit("released")
+				try {
+					client.emit("released")
+					// No idea why, but fixes bug
+					spawn("kill", [user.pid + 1])
+					user.cooldown = false
+					user.pid = 0
+					clearTimeout(user.timeout)
+				} catch (e) {}
 			})
 
 			client.on("tryPassword", function(data) {

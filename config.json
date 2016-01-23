@@ -1,10 +1,15 @@
 {
 	"web": {
 		"port": 8200,
-		"password": "admin",
+		"password": "admins",
+		"blockSpam": 5,
 		"text": {
+			"loading": "Loading...",
+			"search": "Search...",
 			"needAuth": "You need a password for this server.",
-			"pickSound": "Choose a sound to assign."
+			"pickSound": "Choose a sound to assign.",
+			"disconnect": "You're no longer connected to the server.<br>Trying to reconnect...",
+			"blocked": "You're blocked for sending too many requests. <br><i class='fa fa-frown-o'></i>"
 		}
 	}
 }

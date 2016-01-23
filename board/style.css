@@ -137,6 +137,16 @@ li div {
 	position: relative;
 }
 
+#player > .playProgress {
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0%;
+	background: rgba(0, 0, 0, .05);
+	transition: width .1s linear;
+}
+
 #playing {
 	height: 60px;
 	background: #3C6581;
@@ -272,6 +282,23 @@ li div {
 	height: 0px;
 }
 
+#footer {
+	height: 27px;
+	padding-top: 3px;
+	text-align: center;
+	background: rgba(0, 0, 0, .2);
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	opacity: .55;
+}
+
+#footer a {
+	color: #BFBFBF;
+	text-decoration: none;
+}
+
 #picking {
 	position: absolute;
 	height: calc(100% - 550px);
@@ -340,4 +367,23 @@ li div {
 	margin-left: 172px;
 	margin-top: 30px;
 	font-size: 20px;
+}
+
+#fullScreen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 20000;
+	background: #2c3e50;
+	opacity: 1;
+	transition: opacity .2s, background .1s;
+}
+
+#fullScreenText {
+	text-align: center;
+	font-size: 60px;
+	font-weight: lighter;
+	margin-top: 20vh;
 }
