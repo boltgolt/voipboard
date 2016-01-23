@@ -15,17 +15,13 @@ module.exports = {
 		var server = http.createServer(function(req, res){
 			try {
 				if (req.url == "/") {
-					var orgHTML = fs.readFileSync("board/landing.html", "utf8")
-					var list = ""
+					var html = fs.readFileSync("board/landing.html", "utf8")
+					html = html.replace("/*JSON_SOUND_DATA*/", JSON.stringify(soundData))
+					html = html.replace("/*NEED_AUTH*/", (config.web.password == false) ? "none" : "block")
+					html = html.replace("<!--NEED_AUTH_TEXT-->", config.web.text.needAuth)
+					html = html.replace("<!--PICK_TEXT-->", config.web.text.pickSound)
 
-					for (var i = 0; i < soundData.length; i++) {
-						list += "<li id='" + soundData[i].id  + "'><img src='/img/" + soundData[i].id  + "'>"
-							+ "<span>" + soundData[i].name + "</span>"
-							+ "<small>" + soundData[i].source + "</small>"
-							+ "<div>" + soundData[i].duration + " second" + (soundData[i].duration == 1 ? "" : "s") + "</div></li>"
-					}
-
-					res.write(orgHTML.replace("<!--SOUND_LISTING-->", list))
+					res.write(html)
 				}
 				else if (req.url == "/style.css") {
 					res.write(fs.readFileSync("board/style.css", "utf8"))
@@ -33,11 +29,14 @@ module.exports = {
 				else if (req.url == "/script.js") {
 					res.write(fs.readFileSync("board/script.js", "utf8"))
 				}
+				else if (req.url == "/data.json") {
+					res.write(fs.readFileSync("sounds/data.js", "utf8").replace("module.exports = ", ""))
+				}
 
 				else if (req.url.substring(0, 5) == "/img/") {
 					var id = req.url.split("/")[req.url.split("/").length - 1]
 
-					if (getSoundById(id)) {
+					if (getSoundById(id) || id == "noimage") {
 						res.write(fs.readFileSync("sounds/img/" + id + ".png"))
 					}
 				}
@@ -49,7 +48,7 @@ module.exports = {
 			}
 
 			res.end()
-		}).listen(config.serverPort)
+		}).listen(config.web.port)
 
 		var socket = io.listen(server);
 
@@ -57,19 +56,29 @@ module.exports = {
 			var user = {
 				"pid": 0,
 				"cooldown": false,
+				"auth": false,
 				"id": client.id
 			}
 
 			clientCount++
 			webserverEvents.emit("connectionCange", clientCount)
 
-			client.on("play", function(data) {
-				var sound = getSoundById(data)
+			if (config.web.password == false) {
+				user.auth = true
+			}
 
-				if (!sound || user.cooldown) {
+			client.on("play", function(data) {
+				console.log(data);
+				if (user.cooldown || !user.auth) {
 					return
 				}
+				console.log(data);
+				var sound = getSoundById(data)
 
+				if (!sound) {
+					return
+				}
+				console.log(data);
 				user.cooldown = true
 
 				setTimeout(function () {
@@ -81,7 +90,7 @@ module.exports = {
 			})
 
 			client.on("kill", function() {
-				if (user.pid == 0) {
+				if (user.pid == 0 || !user.auth) {
 					return
 				}
 
@@ -90,6 +99,16 @@ module.exports = {
 				user.cooldown = false
 				user.pid = 0
 				client.emit("released")
+			})
+
+			client.on("tryPassword", function(data) {
+				if (user.auth) {
+					client.emit("authDone")
+				}
+				else if (data === config.web.password) {
+					client.emit("authDone")
+					user.auth = true
+				}
 			})
 
 			client.on("disconnect", function() {

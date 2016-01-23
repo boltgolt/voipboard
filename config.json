@@ -1,3 +1,10 @@
 {
-	"serverPort": 8200
+	"web": {
+		"port": 8200,
+		"password": "admin",
+		"text": {
+			"needAuth": "You need a password for this server.",
+			"pickSound": "Choose a sound to assign."
+		}
+	}
 }

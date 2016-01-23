@@ -4,27 +4,97 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Viopboard Web</title>
 
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300" rel="stylesheet" type="text/css">
 	<link href="style.css" rel="stylesheet" type="text/css">
 
 	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var sounds = /*JSON_SOUND_DATA*/
+	</script>
 	<script src="script.js"></script>
 </head>
 <body>
-	<ul>
-<!--SOUND_LISTING-->
-	</ul>
-	<div id="playing">
-		<div>
-			<div></div>
-			<div id="playingControls">
-				<!-- <div>
-					Playing sound
-				</div> -->
-				<div id="kill">
-					𝄥
+	<div id="soundList">
+		<div id="search">
+			<div id="searchClear" class="fa fa-times-circle" onclick="document.getElementById('searchInput').value = ''"></div>
+			<input id="searchInput" type="text" placeholder="Search..." autocomplete="off" spellcheck="false">
+			<div id="searchButton" class="fa fa-search"></div>
+		</div>
+		<ul id="soundUl">
+			<h4>Loading sounds...</h4>
+		</ul>
+	</div>
+	<div id="player">
+		<div id="playing">
+			<div class="playProgress"></div>
+			<div id="playIcon" class="fa fa-play"></div>
+			<div>
+				<div id="timeRemaining">00:00</div>
+				<div id="timeTotal">00:00</div>
+				<div id="playBar"><div class="playProgress"></div></div>
+			</div>
+			<div id="playReplay" class="fa fa-refresh"></div>
+		</div>
+		<div id="buttons">
+			<div>
+				<div id="button7">
+					<img src="/img/noimage">
+					<span>7</span>
+				</div>
+				<div id="button8">
+					<img src="/img/noimage">
+					<span>8</span>
+				</div>
+				<div id="button9">
+					<img src="/img/noimage">
+					<span>9</span>
 				</div>
 			</div>
+			<div>
+				<div id="button4">
+					<img src="/img/noimage">
+					<span>4</span>
+				</div>
+				<div id="button5">
+					<img src="/img/noimage">
+					<span>5</span>
+				</div>
+				<div id="button6">
+					<img src="/img/noimage">
+					<span>6</span>
+				</div>
+			</div>
+			<div>
+				<div id="button1">
+					<img src="/img/noimage">
+					<span>1</span>
+				</div>
+				<div id="button2">
+					<img src="/img/noimage">
+					<span>2</span>
+				</div>
+				<div id="button3">
+					<img src="/img/noimage">
+					<span>3</span>
+				</div>
+			</div>
+			<div>
+				<div id="button0">
+					<img src="/img/noimage">
+					<span>0</span>
+				</div>
+			</div>
+			<div id="picking">
+				<!--PICK_TEXT-->
+			</div>
+		</div>
+	</div>
+	<div id="auth" style="display: /*NEED_AUTH*/">
+		<div>
+			<div class="fa fa-lock"></div>
+			<h4><!--NEED_AUTH_TEXT--></h4>
+			<input id="passwordInput" type="text" placeholder="Password" autocomplete="off" spellcheck="false" autofocus>
 		</div>
 	</div>
 </body>
