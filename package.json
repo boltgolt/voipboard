@@ -10,5 +10,7 @@
 	},
 	"scripts": {
 		"start": "./node_modules/.bin/electron ."
-	}
+	},
+	"license": "GPL-3.0",
+	"repository": "Boltgolt/voipboard"
 }

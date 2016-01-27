@@ -81,7 +81,7 @@ body {
 	height: calc(100vh - 60px);
 }
 
-li {
+#soundUl li {
 	padding: 0;
 	margin: 0;
 	height: 100px;
@@ -90,19 +90,22 @@ li {
 	cursor: pointer;
 }
 
-li:nth-child(odd) {
+#soundUl li:nth-child(odd) {
 	background: none;
 }
 
-li span {
+#soundUl li span {
 	display: block;
-	margin-top: -95px;
+	margin-top: -93px;
 	margin-left: 225px;
 	font-size: 27px;
 	font-weight: lighter;
+	height: 40px;
+	overflow: hidden;
+	padding-right: 115px;
 }
 
-li * {
+#soundUl li * {
 	pointer-events: none;
 	-webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -112,7 +115,7 @@ li * {
     user-select: none;
 }
 
-li small {
+#soundUl li small {
 	margin-left: 225px;
 	font-size: 20px;
 	font-weight: lighter;
@@ -120,7 +123,7 @@ li small {
 	display: inline-block;
 }
 
-li div {
+#soundUl li div {
 	position: absolute;
 	font-weight: lighter;
 	width: 120px;
@@ -211,6 +214,10 @@ li div {
 	width: 0%;
 	background: rgba(28, 37, 54, .45);
 	transition: width .1s linear;
+}
+
+#buttons {
+	padding-top: 25px;
 }
 
 #buttons > div {
@@ -386,4 +393,62 @@ li div {
 	font-size: 60px;
 	font-weight: lighter;
 	margin-top: 20vh;
+}
+
+@media screen and (max-width: 1300px) {
+	#soundList {
+		width: 100%;
+	}
+
+	#player {
+		visibility: hidden;
+	}
+
+	#buttons {
+		display: none;
+	}
+
+	#playing {
+		position: fixed;
+		left: 0px;
+		width: 100%;
+		bottom: 0px;
+		visibility: initial;
+	}
+
+	#playing > div:nth-child(3) {
+		width: 80%;
+		padding: 0px;
+		left: 10%;
+	}
+}
+
+@media screen and (max-width: 900px) {
+	#soundUl li div {
+		display: none;
+	}
+
+	#soundUl li span {
+		padding-right: 10px;
+	}
+}
+
+@media screen and (max-width: 700px) {
+	#soundUl li {
+		margin-top: -12px;
+	}
+
+	#soundUl li img {
+		display: none;
+	}
+
+	#soundUl li span {
+		margin-top: 10px;
+		margin-left: 20px;
+		padding-top: 15px;
+	}
+
+	#soundUl li small {
+		margin-left: 20px;
+	}
 }

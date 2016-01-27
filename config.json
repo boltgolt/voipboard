@@ -1,7 +1,7 @@
 {
 	"web": {
 		"port": 8200,
-		"password": "admins",
+		"password": "admind",
 		"blockSpam": 5,
 		"text": {
 			"loading": "Loading...",
